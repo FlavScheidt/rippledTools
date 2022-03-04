@@ -33,8 +33,8 @@ fi
 ##########################
 #	GET LIST OF NODES
 ##########################
-# nodes=($(cat ClusterConfig.csv | cut -d ',' -f2))
-nodes="lotus"
+nodes=($(cat ClusterConfig.csv | cut -d ',' -f2))
+# nodes="lotus"
 # echo ${nodes[@]}
 
 #########################
