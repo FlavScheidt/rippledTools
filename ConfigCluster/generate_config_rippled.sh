@@ -44,7 +44,7 @@ nodes="lotus"
 for n in "${nodes[@]}";
 do
 	# RYCB Uncomment if you want to use the rippled.cfg that is already configured on your node
-	# spawn scp ${n}:/opt/local/etc/rippled.cfg ./rippled_${n}.cfg
+	# scp ${n}:/opt/local/etc/rippled.cfg ./rippled_${n}.cfg
 
 	# RYCB Uncomment if you want to use the local rippled.cfg file (you need to provide the keys, then)
 	cp rippled.cfg rippled_${n}.cfg
@@ -91,6 +91,6 @@ do
 	echo "" | tee -a rippled_${n}.cfg >/dev/null
 
 	# Send to server
-	spawn scp ./rippled_${n}.cfg ${n}:${CONFIG_DIR}/rippled.cfg
-	spawn scp ./validators_${n}.txt ${n}:${CONFIG_DIR}/validators.txt
+	scp ./rippled_${n}.cfg ${n}:${CONFIG_DIR}/rippled.cfg
+	scp ./validators_${n}.txt ${n}:${CONFIG_DIR}/validators.txt
  done
