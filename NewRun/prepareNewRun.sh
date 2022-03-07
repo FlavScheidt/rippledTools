@@ -70,9 +70,9 @@ do
 	#Rename the last log with the timestamp a the begining of the log
 
 	LOG_DATE=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f1")
-	LOG_HOUR=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ': -f1")
-	LOG_MIN=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ': -f2")
-	LOG_SEC=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ': -f3 | cut -d '. -f1")
+	LOG_HOUR=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ':' -f1")
+	LOG_MIN=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ':' -f2")
+	LOG_SEC=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ':' -f3 | cut -d '.' -f1")
 
 
 	ssh ${node} "mv ${LOGS_DIR}/debug.log ${NEW_LOGS_DIR}/debug_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.log"
