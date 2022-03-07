@@ -37,8 +37,6 @@ NEW_GRPCLOGS_DIR="/root/sntrippled/grpc/logs"
 ##########################
 readarray -t nodes < ./nodes.txt
 
-echo "${nodes[@]}"
-
 for node in "${nodes}";
 do
 	echo ${node}
@@ -46,29 +44,29 @@ do
 	##########################
 	#	CHECK NEW DIRECTORIES
 	##########################
-	if [ ! -d "$NEW_LOGS_DIR" ]
+	if ssh ${node} "[ ! -d $NEW_LOGS_DIR ]"
 	then
-		mkdir "$NEW_LOGS_DIR"
+		ssh ${node} "mkdir $NEW_LOGS_DIR"
 	fi
 
-	if [ ! -d "$NEW_DB_DIR" ]
+	if ssh ${node} "[ ! -d $NEW_DB_DIR ]"
 	then
-		mkdir "$NEW_DB_DIR"
+		ssh ${node} "mkdir $NEW_DB_DIR"
 	fi
 
 	#Specifics for snt
-	if [ ! -d "$NEW_STDOUTLOGS_DIR" ]
+	if ssh ${node} "[ ! -d $NEW_STDOUTLOGS_DIR ]"
 	then
-		mkdir "$NEW_STDOUTLOGS_DIR"
+		ssh ${node} "mkdir $NEW_STDOUTLOGS_DIR"
 	fi
 
-	if [ ! -d "$NEW_GRPCLOGS_DIR" ]
+	if ssh ${node} "[ ! -d $NEW_GRPCLOGS_DIR ]"
 	then
-		mkdir "$NEW_GRPCLOGS_DIR"
+		ssh ${node} "mkdir $NEW_GRPCLOGS_DIR"
 	fi
 
 
-	if [ -f ${LOGS_DIR}/debug.log ]
+	if ssh ${node} "[ -f ${LOGS_DIR}/debug.log ]"
 	then
 
 		#########################
@@ -87,7 +85,7 @@ do
 		#########################
 		#	Rename database
 		#########################
-		if [ -d "${DB_DIR}/db" ]
+		if ssh ${node} "[ -d ${DB_DIR}/db ]"
 		then
 			ssh ${node} "mkdir ${NEW_DB_DIR}/db_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}"
 			ssh ${node} "mv ${DB_DIR}/db/* ${NEW_DB_DIR}/db_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}/"
@@ -99,7 +97,7 @@ do
 		########################
 		# Rename stdout logs
 		########################
-		if [ -f ${STDOUTLOGS_DIR}/log.out ]
+		if ssh ${node} "[ -f ${STDOUTLOGS_DIR}/log.out ]"
 		then
 			ssh ${node} "mv ${STDOUTLOGS_DIR}/log.out ${NEW_STDOUTLOGS_DIR}/log_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.out"
 		else 
@@ -109,7 +107,7 @@ do
 		########################
 		# Rename GRPC logs
 		########################
-		if [ -f ${STDOUTLOGS_DIR}/log.out ]
+		if ssh ${node} "[ -f ${STDOUTLOGS_DIR}/log.out ]"
 		then
 			ssh ${node} "mv ${GRPCLOGS_DIR}/log.out ${NEW_GRPCLOGS_DIR}/log_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.out"
 		else 
