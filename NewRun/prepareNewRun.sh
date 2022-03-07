@@ -63,6 +63,7 @@ readarray -t nodes < ./nodes.txt
 
 for node in "${nodes}";
 do
+	echo ${node}
 
 	#########################
 	#	Rename logs
