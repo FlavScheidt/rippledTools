@@ -1,5 +1,3 @@
-Update rippled.cfg file with these values and restart rippled:
-
 # validator public key: nHDnszzK8YXuvoG973VmaxXcit1RiQi3zGa4og8quFZ9LFGENx2H
 
 [validator_token]
