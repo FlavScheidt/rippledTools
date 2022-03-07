@@ -31,39 +31,42 @@ NEW_STDOUTLOGS_DIR="/root/sntrippled/my_build/logs"
 GRPCLOGS_DIR="/root/sntrippled/grpc"
 NEW_GRPCLOGS_DIR="/root/sntrippled/grpc/logs"
 
-##########################
-#	CHECK NEW DIRECTORIES
-##########################
-if [ ! -d "$NEW_LOGS_DIR" ]
-then
-	mkdir "$NEW_LOGS_DIR"
-fi
-
-if [ ! -d "$NEW_DB_DIR" ]
-then
-	mkdir "$NEW_DB_DIR"
-fi
-
-#Specifics for snt
-if [ ! -d "$NEW_STDOUTLOGS_DIR" ]
-then
-	mkdir "$NEW_STDOUTLOGS_DIR"
-fi
-
-if [ ! -d "$NEW_GRPCLOGS_DIR" ]
-then
-	mkdir "$NEW_GRPCLOGS_DIR"
-fi
-
 
 ##########################
 #	START
 ##########################
 readarray -t nodes < ./nodes.txt
 
+echo "${nodes[@]}"
+
 for node in "${nodes}";
 do
 	echo ${node}
+
+	##########################
+	#	CHECK NEW DIRECTORIES
+	##########################
+	if [ ! -d "$NEW_LOGS_DIR" ]
+	then
+		mkdir "$NEW_LOGS_DIR"
+	fi
+
+	if [ ! -d "$NEW_DB_DIR" ]
+	then
+		mkdir "$NEW_DB_DIR"
+	fi
+
+	#Specifics for snt
+	if [ ! -d "$NEW_STDOUTLOGS_DIR" ]
+	then
+		mkdir "$NEW_STDOUTLOGS_DIR"
+	fi
+
+	if [ ! -d "$NEW_GRPCLOGS_DIR" ]
+	then
+		mkdir "$NEW_GRPCLOGS_DIR"
+	fi
+
 
 	if [ -f ${LOGS_DIR}/debug.log ]
 	then
