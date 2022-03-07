@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+~/ConfigCluster/validators_*
+~/ConfigCluster/rippled_*
