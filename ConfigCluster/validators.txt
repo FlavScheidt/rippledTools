@@ -53,15 +53,15 @@
 #          do not sufficiently overlap with the list(s) used by others.
 #          See: https://arxiv.org/pdf/1802.07242.pdf
 
-[validator_list_sites]
-https://vl.ripple.com
-https://vl.xrplf.org
+#[validator_list_sites]
+#https://vl.ripple.com
+#https://vl.xrplf.org
 
-[validator_list_keys]
+#[validator_list_keys]
 #vl.ripple.com
-ED2677ABFFD1B33AC6FBC3062B71F1E8397C1505E1C42C64D11AD1B28FF73F4734
+#ED2677ABFFD1B33AC6FBC3062B71F1E8397C1505E1C42C64D11AD1B28FF73F4734
 # vl.xrplf.org
-ED45D1840EE724BE327ABE9146503D5848EFD5F38B6D5FEDE71E80ACCE5E6E738B
+#ED45D1840EE724BE327ABE9146503D5848EFD5F38B6D5FEDE71E80ACCE5E6E738B
 
 # To use the test network (see https://xrpl.org/connect-your-rippled-to-the-xrp-test-net.html),
 # use the following configuration instead:
@@ -69,5 +69,5 @@ ED45D1840EE724BE327ABE9146503D5848EFD5F38B6D5FEDE71E80ACCE5E6E738B
 # [validator_list_sites]
 # https://vl.altnet.rippletest.net
 #
-# [validator_list_keys]
+[validator_list_keys]
 # ED264807102805220DA0F312E71FC2C69E1552C9C5790F6C25E3729DEB573D5860

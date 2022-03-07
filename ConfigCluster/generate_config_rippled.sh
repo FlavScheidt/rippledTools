@@ -18,16 +18,16 @@
 ##########################
 rippledmon_IP=127.0.0.1
 #CONFIG_DIR is the folder where you want to put the files on the target servers
-CONFIG_DIR="/home/xrpl/config/"
+CONFIG_DIR="/root/config/"
 
 ##########################
 #	Craeting some directories
 #		(if needed)
 ##########################
-if [ ! -d "$CONFIG_DIR" ]
-then
-	mkdir "$CONFIG_DIR"
-fi
+#if [ ! -d "$CONFIG_DIR" ]
+#then
+#	mkdir "$CONFIG_DIR"
+#fi
 
 
 ##########################
@@ -91,6 +91,7 @@ do
 	echo "" | tee -a rippled_${n}.cfg >/dev/null
 
 	# Send to server
+	ssh ${n} "mkdir ${CONFIG_DIR}"
 	scp ./rippled_${n}.cfg ${n}:${CONFIG_DIR}/rippled.cfg
 	scp ./validators_${n}.txt ${n}:${CONFIG_DIR}/validators.txt
  done
