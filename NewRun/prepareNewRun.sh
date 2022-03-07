@@ -65,35 +65,56 @@ for node in "${nodes}";
 do
 	echo ${node}
 
-	#########################
-	#	Rename logs
-	#########################
-	#Rename the last log with the timestamp a the begining of the log
+	if [ -f ${LOGS_DIR}/debug.log ]
+	then
 
-	LOG_DATE=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f1")
-	LOG_HOUR=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ':' -f1")
-	LOG_MIN=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ':' -f2")
-	LOG_SEC=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ':' -f3 | cut -d '.' -f1")
+		#########################
+		#	Rename logs
+		#########################
+		#Rename the last log with the timestamp a the begining of the log
 
-
-	ssh ${node} "mv ${LOGS_DIR}/debug.log ${NEW_LOGS_DIR}/debug_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.log"
-
-	#########################
-	#	Rename database
-	#########################
-	ssh ${node} "mkdir ${NEW_DB_DIR}/db_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}"
-	ssh ${node} "mv ${DB_DIR}/db/* ${NEW_DB_DIR}/db_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}/"
+		LOG_DATE=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f1")
+		LOG_HOUR=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ':' -f1")
+		LOG_MIN=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ':' -f2")
+		LOG_SEC=$(ssh ${node} "head -1 ${LOGS_DIR}/debug.log | cut -d ' ' -f2 | cut -d ':' -f3 | cut -d '.' -f1")
 
 
-	#Here down is for the specific use on Snts project
-	########################
-	# Rename stdout logs
-	########################
-	ssh ${node} "mv ${STDOUTLOGS_DIR}/log.out ${NEW_STDOUTLOGS_DIR}/log_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.out"
+		ssh ${node} "mv ${LOGS_DIR}/debug.log ${NEW_LOGS_DIR}/debug_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.log"
 
-	########################
-	# Rename GRPC logs
-	########################
-	ssh ${node} "mv ${GRPCLOGS_DIR}/log.out ${NEW_GRPCLOGS_DIR}/log_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.out"
+		#########################
+		#	Rename database
+		#########################
+		if [ -d "${DB_DIR}/db" ]
+		then
+			ssh ${node} "mkdir ${NEW_DB_DIR}/db_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}"
+			ssh ${node} "mv ${DB_DIR}/db/* ${NEW_DB_DIR}/db_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}/"
+		else 
+			echo "No database"
+		fi
+
+		#Here down is for the specific use on Snts project
+		########################
+		# Rename stdout logs
+		########################
+		if [ -f ${STDOUTLOGS_DIR}/log.out ]
+		then
+			ssh ${node} "mv ${STDOUTLOGS_DIR}/log.out ${NEW_STDOUTLOGS_DIR}/log_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.out"
+		else 
+			echo "No stdout log"
+		fi
+
+		########################
+		# Rename GRPC logs
+		########################
+		if [ -f ${STDOUTLOGS_DIR}/log.out ]
+		then
+			ssh ${node} "mv ${GRPCLOGS_DIR}/log.out ${NEW_GRPCLOGS_DIR}/log_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.out"
+		else 
+			echo "No gRPC logs"
+		fi
+	else 
+		echo "No log to rename"
+		echo "Cant get date, bye."
+	fi
 
 done
