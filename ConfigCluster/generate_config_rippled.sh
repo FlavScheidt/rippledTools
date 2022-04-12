@@ -41,7 +41,7 @@ else
 	##########################
 	#	GET LIST OF NODES
 	##########################
-	nodes=($(cat ClusterConfig.csv | cut -d ',' -f2))
+	nodes=($(cat ClusterConfigSmall.csv | cut -d ',' -f2))
 	# nodes="lotus"
 	# echo ${nodes[@]}
 
@@ -76,19 +76,20 @@ else
 
 		# Insight
 		# RYCB If you don't want to configure rippledmon, comment this line
-		echo "[insight]" | tee -a rippled_${n}.cfg >/dev/null
-		echo "server=statsd" | tee -a rippled_${n}.cfg >/dev/null
-		echo "addres=${rippledmon_IP}:8125" | tee -a rippled_${n}.cfg >/dev/null
-		echo "prefix=${n}_" | tee -a rippled_${n}.cfg >/dev/null
-		echo "" | tee -a rippled_${n}.cfg >/dev/null
+		# echo "[insight]" | tee -a rippled_${n}.cfg >/dev/null
+		# echo "server=statsd" | tee -a rippled_${n}.cfg >/dev/null
+		# echo "addres=${rippledmon_IP}:8125" | tee -a rippled_${n}.cfg >/dev/null
+		# echo "prefix=${n}_" | tee -a rippled_${n}.cfg >/dev/null
+		# echo "" | tee -a rippled_${n}.cfg >/dev/null
 
 
 		# Print the IPS of the UNL
 		# First we need to get the ips
-		readarray -t unl < ./unl/fullyConnected/${n}.txt
+		readarray -t unl < ./unl/fullySmall/${n}.txt
 		# echo ${unl[@]}
 
 		#Print header into rippled.cfg
+		echo "" | tee -a rippled_${n}.cfg >/dev/null
 		echo "[ips_fixed]" | tee -a rippled_${n}.cfg >/dev/null
 
 		#iterate over unl and print ips into rippled.cfg and keys into validators.txt

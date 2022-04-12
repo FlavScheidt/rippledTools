@@ -1,7 +1,6 @@
 lotus
-caterham
-ligier
-minardi
-sauber
-benetton
+vtoleman
+vligier
+scaterham
 toleman
+slotus

@@ -1,6 +1,6 @@
-vlotus
+lotus
+ligier
+minardi
 sauber
 benetton
-caterham
-ligier
 toleman

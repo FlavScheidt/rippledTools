@@ -1,7 +1,4 @@
-lotus
-caterham
-ligier
-minardi
-sauber
 brawn
-benetton
+slotus
+minardi
+caterham
