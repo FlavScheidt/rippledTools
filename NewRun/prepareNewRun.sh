@@ -16,7 +16,7 @@
 ##########################
 #	EDITABLE VARIABLES
 ##########################
-LOGS_DIR="/var/log/rippled"
+LOGS_DIR="/root/var/log/rippled"
 DB_DIR="/var/lib/rippled"
 
 #I STRONGLY REMCOMEND MOVING THE LOGS AND DB TO A NEW LOCATION
@@ -28,8 +28,8 @@ NEW_DB_DIR="/root/rippledDBs"
 STDOUTLOGS_DIR="/root/sntrippled/my_build"
 NEW_STDOUTLOGS_DIR="/root/sntrippled/my_build/logs"
 
-GRPCLOGS_DIR="/root/sntrippled/grpc"
-NEW_GRPCLOGS_DIR="/root/sntrippled/grpc/logs"
+GRPCLOGS_DIR="/root/gossipGoSnt"
+NEW_GRPCLOGS_DIR="/root/gossipGoSnt/logs"
 
 
 ##########################
@@ -107,7 +107,7 @@ do
 		########################
 		# Rename GRPC logs
 		########################
-		if ssh ${n} "[ -f ${STDOUTLOGS_DIR}/log.out ]"
+		if ssh ${n} "[ -f ${GRPCLOGS_DIR}/log.out ]"
 		then
 			ssh ${n} "mv ${GRPCLOGS_DIR}/log.out ${NEW_GRPCLOGS_DIR}/log_${LOG_DATE}_${LOG_HOUR}_${LOG_MIN}_${LOG_SEC}.out"
 		else 

@@ -85,7 +85,7 @@ else
 
 		# Print the IPS of the UNL
 		# First we need to get the ips
-		readarray -t unl < ./unl/${n}.txt
+		readarray -t unl < ./unl/fullyConnected/${n}.txt
 		# echo ${unl[@]}
 
 		#Print header into rippled.cfg
