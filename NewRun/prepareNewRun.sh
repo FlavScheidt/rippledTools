@@ -21,15 +21,15 @@ DB_DIR="/var/lib/rippled"
 
 #I STRONGLY REMCOMEND MOVING THE LOGS AND DB TO A NEW LOCATION
 #Dont put relative paths, they wont work
-NEW_LOGS_DIR="/root/rippledLogs"
-NEW_DB_DIR="/root/rippledDBs"
+NEW_LOGS_DIR="/home/xrpl/rippledLogs"
+NEW_DB_DIR="/home/xrpl/rippledDBs"
 
 #Specifics for snts project
 STDOUTLOGS_DIR="/root/sntrippled/my_build"
-NEW_STDOUTLOGS_DIR="/root/sntrippled/my_build/logs"
+NEW_STDOUTLOGS_DIR="/home/xrpl/rippledStdOutLogs"
 
 GRPCLOGS_DIR="/root/gossipGoSnt"
-NEW_GRPCLOGS_DIR="/root/gossipGoSnt/logs"
+NEW_GRPCLOGS_DIR="/home/xrpl/rippledgRPCLogs"
 
 
 ##########################

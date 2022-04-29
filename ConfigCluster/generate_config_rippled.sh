@@ -16,7 +16,7 @@
 ##########################
 #	EDITABLE VARIABLES
 ##########################
-rippledmon_IP="192.168.20.52"
+rippledmon_IP="127.0.0.1"
 #CONFIG_DIR is the folder where you want to put the files on the target servers
 CONFIG_DIR="/root/config/"
 
@@ -41,7 +41,7 @@ else
 	##########################
 	#	GET LIST OF NODES
 	##########################
-	nodes=($(cat ClusterConfigSmall.csv | cut -d ',' -f2))
+	nodes=($(cat ClusterConfig.csv | cut -d ',' -f2))
 	# nodes="lotus"
 	# echo ${nodes[@]}
 
@@ -76,16 +76,17 @@ else
 
 		# Insight
 		# RYCB If you don't want to configure rippledmon, comment this line
-		# echo "[insight]" | tee -a rippled_${n}.cfg >/dev/null
-		# echo "server=statsd" | tee -a rippled_${n}.cfg >/dev/null
-		# echo "addres=${rippledmon_IP}:8125" | tee -a rippled_${n}.cfg >/dev/null
-		# echo "prefix=${n}_" | tee -a rippled_${n}.cfg >/dev/null
-		# echo "" | tee -a rippled_${n}.cfg >/dev/null
+		echo "" | tee -a rippled_${n}.cfg >/dev/null
+		echo "[insight]" | tee -a rippled_${n}.cfg >/dev/null
+		echo "server=statsd" | tee -a rippled_${n}.cfg >/dev/null
+		echo "addres=${rippledmon_IP}:8125" | tee -a rippled_${n}.cfg >/dev/null
+		echo "prefix=${n}_" | tee -a rippled_${n}.cfg >/dev/null
+		echo "" | tee -a rippled_${n}.cfg >/dev/null
 
 
 		# Print the IPS of the UNL
 		# First we need to get the ips
-		readarray -t unl < ./unl/fullySmall/${n}.txt
+		readarray -t unl < ./unl/fullyConnected/${n}.txt
 		# echo ${unl[@]}
 
 		#Print header into rippled.cfg
