@@ -2,5 +2,8 @@ vlotus
 sauber
 benetton
 caterham
-ligier
 toleman
+vminardi
+vcaterham
+sbenetton
+stoleman

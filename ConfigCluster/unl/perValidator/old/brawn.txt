@@ -4,7 +4,3 @@ vligier
 scaterham
 toleman
 slotus
-vminardi
-vbrawn
-sauber
-vbenetton
