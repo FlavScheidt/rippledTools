@@ -16,7 +16,7 @@
 ##########################
 #	EDITABLE VARIABLES
 ##########################
-rippledmon_IP="127.0.0.1"
+rippledmon_IP="192.168.20.58"
 #CONFIG_DIR is the folder where you want to put the files on the target servers
 CONFIG_DIR="/root/config/"
 
@@ -68,32 +68,44 @@ else
 		cp validators.txt validators_${n}.txt
 		echo "" | tee -a validators_${n}.txt >/dev/null
 
+		# Insight
+		# RYCB If you don't want to configure rippledmon, comment this line
+		# if [ ${n} = 'lotus' ] 
+		# then
+		# 	echo "" | tee -a rippled_${n}.cfg >/dev/null
+		# 	echo "[insight]" | tee -a rippled_${n}.cfg >/dev/null
+		# 	echo "server=statsd" | tee -a rippled_${n}.cfg >/dev/null
+		# 	echo "address=${rippledmon_IP}:8125" | tee -a rippled_${n}.cfg >/dev/null
+		# 	echo "prefix=${n}" | tee -a rippled_${n}.cfg >/dev/null
+		# 	# echo "" | tee -a rippled_${n}.cfg >/dev/null
+		# fi
+
 		# Add key
 		# RYCB comment if you already configured the key, if not, be sure to put it on the keys folder
 		echo "" | tee -a rippled_${n}.cfg >/dev/null
 		cat ./keys/${n}.txt | tee -a rippled_${n}.cfg >/dev/null
 		echo "" | tee -a rippled_${n}.cfg >/dev/null
 
-		# Insight
-		# RYCB If you don't want to configure rippledmon, comment this line
-		echo "" | tee -a rippled_${n}.cfg >/dev/null
-		echo "[insight]" | tee -a rippled_${n}.cfg >/dev/null
-		echo "server=statsd" | tee -a rippled_${n}.cfg >/dev/null
-		echo "addres=${rippledmon_IP}:8125" | tee -a rippled_${n}.cfg >/dev/null
-		echo "prefix=${n}_" | tee -a rippled_${n}.cfg >/dev/null
-		echo "" | tee -a rippled_${n}.cfg >/dev/null
-
-
 		# Print the IPS of the UNL
 		# First we need to get the ips
-		readarray -t unl < ./unl/fullyConnected/${n}.txt
+		if [ "$1" == "unl" ]
+		then
+			unl=($(cat ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f4))
+			readarray -t unl < ./unl/perUNL/${unl}.txt
+		# elif ["$1" == "general" ]
+		# then
+		# else
+		# 	readarray -t unl < ./unl/fullyConnected/${n}.txt
+		else
+			readarray -t unl < ./unl/perValidator/${n}.txt
+		fi
 		# echo ${unl[@]}
 
 		#Print header into rippled.cfg
 		echo "" | tee -a rippled_${n}.cfg >/dev/null
 		echo "[ips_fixed]" | tee -a rippled_${n}.cfg >/dev/null
 
-		#iterate over unl and print ips into rippled.cfg and keys into validators.txt
+		# #iterate over unl and print ips into rippled.cfg and keys into validators.txt
 		for peer in "${unl[@]}";
 		do
 			# Get IP and print to rippled.cfg
@@ -105,6 +117,42 @@ else
 			echo "$key" | tee -a validators_${n}.txt >/dev/null
 
 		done
+
+		#Now we need to insert the ips and keys of the guys we are SENDINg messages to (only for the perUNL)
+		if [ "$1" == "unl" ]
+		then
+			#Iterate over the UNL files to see in which unl the node is present
+			FILES="./unl/perUNL/*"
+			for f in $FILES
+			do
+				if grep -Fxq "${n}" ${f}
+				then
+					unlName=$(echo ${f} | cut -d "." -f2 | cut -d "/" -f4)
+
+					#Go to the config file and get the keys from the nodes that have this unl
+					ips=($(cat ClusterConfig.csv | grep -i ",${unlName}" | cut -d "," -f1))
+					keys=($(cat ClusterConfig.csv | grep -i ",${unlName}" | cut -d "," -f3))
+
+					for ip in "${ips[@]}"
+					do 
+						isInFile=$(cat rippled_${n}.cfg | grep -c ${ip})
+						if [ $isInFile -eq 0 ]
+						then
+							echo "${ip} 51235" |  tee -a rippled_${n}.cfg >/dev/null;
+						fi
+					done
+					for key in "${keys[@]}"
+					do 						
+						isInFile=$(cat validators_${n}.txt | grep -c ${key})
+						if [ $isInFile -eq 0 ]
+						then
+							echo "${key}" | tee -a validators_${n}.txt >/dev/null;
+						fi
+					done  
+				fi
+			done
+		fi
+
 		echo "" | tee -a rippled_${n}.cfg >/dev/null
 
 		# Send to server
