@@ -88,6 +88,9 @@ else
 		cat ./keys/${n}.txt | tee -a rippled_${n}.cfg >/dev/null
 		echo "" | tee -a rippled_${n}.cfg >/dev/null
 
+		nodeIP=($(cat ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f1))
+		nodeKey=($(cat ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f3))
+
 		# Print the IPS of the UNL
 		# First we need to get the ips
 		if [ "$1" == "unl" ]
@@ -110,14 +113,16 @@ else
 		# #iterate over unl and print ips into rippled.cfg and keys into validators.txt
 		for peer in "${unl[@]}";
 		do
-			# Get IP and print to rippled.cfg
-			ip=($(cat ClusterConfig.csv | grep -i ",${peer}," | cut -d "," -f1))
-			echo "$ip 51235" | tee -a rippled_${n}.cfg >/dev/null
+			if [ "$[peer]" != "${n}" ] 
+			then
+				# Get IP and print to rippled.cfg
+				ip=($(cat ClusterConfig.csv | grep -i ",${peer}," | cut -d "," -f1))
+				echo "$ip 51235" | tee -a rippled_${n}.cfg >/dev/null
 
-			#Get key and print to validators.txt
-			key=($(cat ClusterConfig.csv | grep -i ",${peer}," | cut -d "," -f3))
-			echo "$key" | tee -a validators_${n}.txt >/dev/null
-
+				#Get key and print to validators.txt
+				key=($(cat ClusterConfig.csv | grep -i ",${peer}," | cut -d "," -f3))
+				echo "$key" | tee -a validators_${n}.txt >/dev/null
+			fi
 		done
 
 		#Now we need to insert the ips and keys of the guys we are SENDINg messages to (only for the perUNL)
@@ -138,7 +143,7 @@ else
 					for ip in "${ips[@]}"
 					do 
 						isInFile=$(cat rippled_${n}.cfg | grep -c ${ip})
-						if [ $isInFile -eq 0 ]
+						if [ $isInFile -eq 0 ] || [ "${ip}" == "${nodeIP}" ]
 						then
 							echo "${ip} 51235" |  tee -a rippled_${n}.cfg >/dev/null;
 						fi
@@ -146,7 +151,7 @@ else
 					for key in "${keys[@]}"
 					do 						
 						isInFile=$(cat validators_${n}.txt | grep -c ${key})
-						if [ $isInFile -eq 0 ]
+						if [ $isInFile -eq 0 ] || [ "${key}" == "${nodeKey}" ]
 						then
 							echo "${key}" | tee -a validators_${n}.txt >/dev/null;
 						fi
