@@ -20,6 +20,8 @@ rippledmon_IP="192.168.20.58"
 #CONFIG_DIR is the folder where you want to put the files on the target servers
 CONFIG_DIR="/root/config/"
 
+UNL_DIR="/root/gossipGoSnt/clusterConfig"
+
 ##########################
 #	Craeting some directories
 #		(if needed)
@@ -91,13 +93,13 @@ else
 		if [ "$1" == "unl" ]
 		then
 			unl=($(cat ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f4))
-			readarray -t unl < ./unl/perUNL/${unl}.txt
-		# elif ["$1" == "general" ]
-		# then
-		# else
-		# 	readarray -t unl < ./unl/fullyConnected/${n}.txt
-		else
-			readarray -t unl < ./unl/perValidator/${n}.txt
+			readarray -t unl < ${UNL_DIR}/unl/${unl}.txt
+		elif [ "$1" == "general" ]
+		then
+			readarray -t unl < ./unl/fullyConnected/${n}.txt
+		elif [ "$1" == "validator" ]
+		then
+			readarray -t unl < ${UNL_DIR}/validator/${n}.txt
 		fi
 		# echo ${unl[@]}
 
@@ -122,7 +124,7 @@ else
 		if [ "$1" == "unl" ]
 		then
 			#Iterate over the UNL files to see in which unl the node is present
-			FILES="./unl/perUNL/*"
+			FILES="${UNL_DIR}/unl/*"
 			for f in $FILES
 			do
 				if grep -Fxq "${n}" ${f}

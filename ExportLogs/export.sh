@@ -14,6 +14,7 @@
 ###########################################################
 
 type=$1
+echo "$type"
 
 ##########################
 #	EDITABLE VARIABLES
@@ -85,7 +86,7 @@ do
 	ssh ${n} "cp ${LOGS_DIR}/debug.log ${TYPE_DIR}/debug.log"
 	echo "Rippled logs"
 
-	if [ "$type" == "vanilla" ]
+	if [ "$type" == "vanillaGeneral" ] || [ "$type" == "vanillaValidator" ] || [ "$type" == "vanillaUNL" ]
 	then
 		ssh ${n} "cp ${LOGS_STDOUT_V_DIR}/log.out ${TYPE_DIR}/log_stdout.out"
 		echo "Rippled stdout"
@@ -108,9 +109,9 @@ do
 
 	if [ ! -d "${TEMP_DIR}/${n}" ]
 	then
-		mkdir "${TEMP_DIR}/${n}]"
+		mkdir "${TEMP_DIR}/${n}"
 	fi
-	
+
 	if [ ! -d "${TEMP_DIR}/${n}/${type}" ]
 	then
 		mkdir "${TEMP_DIR}/${n}/${type}"
@@ -124,6 +125,6 @@ do
 	
 	rm -rf ${TEMP_DIR}/${n}/${type}
 	echo "Logs moved to target"
-	done
+done
 	
 	# fi}
