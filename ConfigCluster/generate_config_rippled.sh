@@ -143,7 +143,7 @@ else
 					for ip in "${ips[@]}"
 					do 
 						isInFile=$(cat rippled_${n}.cfg | grep -c ${ip})
-						if [ $isInFile -eq 0 ] || [ "${ip}" != "${nodeIP}" ]
+						if [ $isInFile -eq 0 ] && [ "${ip}" != "${nodeIP}" ]
 						then
 							echo "${ip} 51235" |  tee -a rippled_${n}.cfg >/dev/null;
 						fi
@@ -151,7 +151,7 @@ else
 					for key in "${keys[@]}"
 					do 						
 						isInFile=$(cat validators_${n}.txt | grep -c ${key})
-						if [ $isInFile -eq 0 ] || [ "${key}" != "${nodeKey}" ]
+						if [ $isInFile -eq 0 ] && [ "${key}" != "${nodeKey}" ]
 						then
 							echo "${key}" | tee -a validators_${n}.txt >/dev/null;
 						fi
