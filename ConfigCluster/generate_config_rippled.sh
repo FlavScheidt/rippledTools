@@ -134,7 +134,7 @@ else
 			do
 				if grep -Fxq "${n}" ${f}
 				then
-					unlName=$(echo ${f} | cut -d "." -f2 | cut -d "/" -f4)
+					unlName=$(echo ${f} | cut -d "." -f1 | cut -d "/" -f6)
 					echo ${unlName}
 
 					#Go to the config file and get the keys from the nodes that have this unl
