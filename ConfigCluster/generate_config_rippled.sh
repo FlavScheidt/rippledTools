@@ -135,24 +135,30 @@ else
 				if grep -Fxq "${n}" ${f}
 				then
 					unlName=$(echo ${f} | cut -d "." -f2 | cut -d "/" -f4)
+					echo ${unlName}
 
 					#Go to the config file and get the keys from the nodes that have this unl
 					ips=($(cat ClusterConfig.csv | grep -i ",${unlName}" | cut -d "," -f1))
 					keys=($(cat ClusterConfig.csv | grep -i ",${unlName}" | cut -d "," -f3))
 
+
 					for ip in "${ips[@]}"
 					do 
+						echo ${ip}
 						isInFile=$(cat rippled_${n}.cfg | grep -c ${ip})
 						if [ $isInFile -eq 0 ] && [ "${ip}" != "${nodeIP}" ]
 						then
+							echo "print"
 							echo "${ip} 51235" |  tee -a rippled_${n}.cfg >/dev/null;
 						fi
 					done
 					for key in "${keys[@]}"
 					do 						
+						echo ${key}
 						isInFile=$(cat validators_${n}.txt | grep -c ${key})
 						if [ $isInFile -eq 0 ] && [ "${key}" != "${nodeKey}" ]
 						then
+							echo "print"
 							echo "${key}" | tee -a validators_${n}.txt >/dev/null;
 						fi
 					done  
