@@ -1,8 +1,0 @@
-minardi
-sauber
-caterham
-stoleman
-toleman
-ligier
-vsauber
-vtoleman
