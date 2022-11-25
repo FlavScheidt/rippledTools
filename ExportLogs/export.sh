@@ -61,6 +61,7 @@ do
 	echo "Created directories on the source"
 
 	rm -rf ${TYPE_DIR}/*
+	ssh ${n} "rm -rf  $TYPE_DIR/*"
 	echo "Directories are clean"
 
 	if ssh ${TARGET_ADDRESS} "[ ! -d $TARGET_DIR ]"
@@ -97,8 +98,8 @@ do
 		ssh ${n} "cp ${LOGS_GO_DIR}/log.out ${TYPE_DIR}/log_go.out"
 		echo "GossipSub stdout"
 
-		ssh ${n} "cp ${LOGS_GO_DIR}/trace.json ${TYPE_DIR}/trace.json"
-		echo "GossipSub trace"
+		# ssh ${n} "cp ${LOGS_GO_DIR}/trace.json ${TYPE_DIR}/trace.json"
+		# echo "GossipSub trace"
 	fi;
 
 	if [ ! -d $TEMP_DIR ]

@@ -109,7 +109,7 @@ func main() {
     // -----------------------------------------
     //		Parameters for GossipSub
     // -----------------------------------------
-    //Read nodes name from config file
+    // Read nodes name from config file
     paramsList, er := readParamsFile(GOSSIPSUB_PARAMETERS)
     if er != nil {
         log.Panic(error)
@@ -147,9 +147,13 @@ func main() {
 		HostKeyCallback: hostKeyCallback,
 	}
 
-	//Dial
-	var client [len(hosts)]sshClient
-	err, client = DialParallel(hosts, config)
+	configG := &ssh.ClientConfig{
+		User: user,
+		Auth: []ssh.AuthMethod{
+			ssh.PublicKeys(signer),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
 
 	for _, param := range paramsList {
 		// -----------------------------------------
@@ -157,17 +161,28 @@ func main() {
 	    // -----------------------------------------
 	    log.Println("Starting Rippled")
 	    cmd := RIPPLED_PATH+"rippled --conf="+RIPPLED_CONFIG+" --quorum "+RIPPLED_QUORUM+" &"
-	    go runParallel(hosts, config, timeout, client)
+	    go runParallel(cmd, hosts, config, timeout, "rippled")
 	    time.Sleep(10 * time.Second)
+
+
 
 		// -----------------------------------------
 	 	//    		Start gossipsub
 	 	//    -----------------------------------------
 	 	log.Println("Starting GossipSub")
 	    cmd = "cd "+GOSSIPSUB_PATH+" && "+GOPATH+"/go run . -type="+experiment+" -d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout
-	    go runParallel(cmd, hosts, config, timeout, client)
+	    go runParallel(cmd, hosts, configG, timeout, "gossip")
+
+
+	    time.Sleep(100 * time.Second)
+
+
+	    log.Println("Stopping rippled")
+	   	cmd = RIPPLED_PATH+"rippled stop"
+	    go runParallel(cmd, hosts, config, timeout, "rippledStop") //, client)
+
 	}
 
 	time.Sleep(60 * time.Second)
-	select {}
+	// select {}
  }
