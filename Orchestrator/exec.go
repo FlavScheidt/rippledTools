@@ -1,7 +1,7 @@
 package main
 
 import (
-    "bytes"
+    // "bytes"
     // "fmt"
     // "io"
     // "io/ioutil"
@@ -26,115 +26,107 @@ func runParallel(hostname string, config *ssh.ClientConfig, duration time.Durati
         }
     // defer client.Close()
 
-    start := RIPPLED_PATH+"rippled --conf="+RIPPLED_CONFIG+" --quorum "+RIPPLED_QUORUM+" &"
+    // log.Println(hostname+": New session")
+    // ss, err := client.NewSession()
+    // if err != nil {
+    //     log.Fatal("unable to create SSH session: ", err)
+    // }
+    // defer ss.Close()
+
+    start := RIPPLED_PATH+"rippled --conf="+RIPPLED_CONFIG+" --quorum "+RIPPLED_QUORUM+" &\n"
     // stop  := RIPPLED_PATH+"rippled stop"
     // status := RIPPLED_PATH+"rippled server_info"
+    // gossipsub := "cd "+GOSSIPSUB_PATH+" && "+GOPATH+"/go run . -type="+experiment + "&\n"//+"-d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout
+    gossipsub := "cd "+GOSSIPSUB_PATH+" && go run . -type="+experiment + "&\n"//+"-d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout
+
 
     //Rippled Start
     log.Println(hostname+" Starting Rippled")
-    go runUnblockingCmd(start, hostname, client, duration)//, results)
-    time.Sleep(30 * time.Second)
-
-    // Check rippled status
-    // log.Println(hostname+" status Rippled")
-    // go runAtomicCmd(status, hostname, client, duration)//, results)
-
-    //GossipSubStart
-    gossipsub := "cd "+GOSSIPSUB_PATH+" && "+GOPATH+"/go run . -type="+experiment + "&"//+"-d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout
-    // go runAndStopCmd(gossipsub, hostname, client, duration)//, results)
+    go remoteShell(start, gossipsub, 60, client)
+    // go runUnblockingCmd(start, hostname, client, duration)//, results)
+    // // Check rippled status
+    // log.Println(hostname+" GossipSub")
+    // go runAtomicCmd(gossipsub, hostname, client, duration)//, results)
 
 
-    // Check rippled status
-    log.Println(hostname+" GossipSub")
-    go runAtomicCmd(gossipsub, hostname, client, duration)//, results)
+    // // StdinPipe for commands
+    // stdin, err := sess.StdinPipe()
+    // if err != nil {
+    //     log.Fatal(err)
+    // }
+
+
+
 }
 
-func executeCmd(cmd string, ss *ssh.Session) {//} string { //, tp string) {
-
-    // var stdoutBuf bytes.Buffer
-    // ss.Stdout = &stdoutBuf
+// func executeCmd(cmd string, ss *ssh.Session) {//} string { //, tp string) {
         
-    err := ss.Run(cmd)
+//     err := ss.Run(cmd)
+//     if err != nil {
+//         log.Fatal(err)
+//     }
+// }
+
+func remoteShell(cmd1 string, cmd2 string, sleep int,client *ssh.Client) {
+
+  // Create sesssion
+    sess, err := client.NewSession()
+    if err != nil {
+        log.Fatal("Failed to create session: ", err)
+    }
+    defer sess.Close()
+
+    sess.Setenv("GOPATH", GOPATH)
+
+    // StdinPipe for commands
+    stdinBuf, err := sess.StdinPipe()
     if err != nil {
         log.Fatal(err)
     }
 
-    // Let's print out the result of command.
-    // fmt.Println(stdoutBuf.String())
+    // Uncomment to store output in variable
+    //var b bytes.Buffer
+    //sess.Stdout = &b
+    //sess.Stderr = &b
 
-    // return stdoutBuf.String()
-}
+    // Enable system stdout
+    // Comment these if you uncomment to store in variable
+    // sess.Stdout = os.Stdout
+    sess.Stderr = os.Stderr
 
-
-//Run cmd and interprets output until a segmentation fault is detected
-func runUnblockingCmd(cmd string, hostname string, client *ssh.Client, duration time.Duration) { //, results chan string) {
-
-    // timeout := time.After(duration)
-    // results := make(chan string, 10)
-
-    //new session
-    log.Println(hostname+": New session")
-    ss, err := client.NewSession()
+    // Start remote shell
+    err = sess.Shell()
     if err != nil {
-        log.Fatal("unable to create SSH session: ", err)
+        log.Fatal(err)
     }
 
-    var stdoutBuf bytes.Buffer
-    ss.Stdout = &stdoutBuf
-
-    // go func(hostname string) {
-    //     results <- executeCmd(cmd, ss)
-    // }(hostname)
-
-    go executeCmd(cmd, ss)
-
-    // fmt.Println(stdoutBuf.String())
-
-    // select {
-    //     case res := <-results:
-    //         log.Println(hostname+" result")
-    //         fmt.Print(res)
-    //     case <-timeout:
-    //         fmt.Println("Timed out!")
-    //         // ss.Close()
-    //         return
+    // send the commands
+    // commands := []string{
+    //     "pwd",
+    //     "whoami",
+    //     "echo 'bye'",
+    //     "exit",
     // }
 
-}
+    // for _, cmd := range commands {
+    //     _, err = fmt.Fprintf(stdin, "%s\n", cmd)
+    //     if err != nil {
+    //         log.Fatal(err)
+    //     }
+    // }
+    stdinBuf.Write([]byte(cmd1))
+    time.Sleep(60 * time.Second)
+    stdinBuf.Write([]byte(cmd2))
 
 
-//Run an atomic ssh command, usually just a status call
-//Stdout goes directly to the stdout
-func runAtomicCmd(cmd string, hostname string, client *ssh.Client, duration time.Duration) { //, results chan string) {
-
-    // timeout := time.After(duration)
-    // results := make(chan string, 10)
-
-    //new session
-    log.Println(hostname+": New session")
-    sse, err := client.NewSession()
+    // Wait for sess to finish
+    err = sess.Wait()
     if err != nil {
-        log.Fatal("unable to create SSH session: ", err)
+        log.Fatal(err)
     }
 
-    sse.Stdout = os.Stdout
-    // ss.Stderr = os.Stderr
-
-    // go func(hostname string) {
-    //     results <- executeCmd(cmd, ss)
-    // }(hostname)
-
-    go executeCmd(cmd, sse)
-
-    // select {
-    //     case res := <-results:
-    //         log.Println(hostname+" result")
-    //         fmt.Print(res)
-    //     case <-timeout:
-    //         fmt.Println("Timed out!")
-    //         // ss.Close()
-    //         return
-    // }
+    // Uncomment to store in variable
+    //fmt.Println(b.String())
 
 }
 

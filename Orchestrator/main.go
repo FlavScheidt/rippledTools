@@ -127,7 +127,7 @@ func main() {
     timeout := 4800 * time.Second
 
 	// key, err := ioutil.ReadFile("/root/.ssh/id_rsa")
-	key, err := ioutil.ReadFile("/home/xrpl/.ssh/id_rsa")
+	key, err := ioutil.ReadFile("/root/.ssh/id_rsa")
 	if err != nil {
 		log.Fatalf("unable to read private key: %v", err)
 	}
@@ -139,7 +139,7 @@ func main() {
 	}
 
 	// hostKeyCallback, err := kh.New("/root/.ssh/known_hosts")
-	hostKeyCallback, err := kh.New("/home/xrpl/.ssh/known_hosts")
+	hostKeyCallback, err := kh.New("/root/.ssh/known_hosts")
 	if err != nil {
 		log.Fatal("could not create hostkeycallback function: ", err)
 	}
@@ -201,6 +201,6 @@ func main() {
 
 	}
 
-	time.Sleep(100 * time.Second)
-	// select {}
+	// time.Sleep(100 * time.Second)
+	select {}
  }
