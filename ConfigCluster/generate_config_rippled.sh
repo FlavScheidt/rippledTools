@@ -43,7 +43,12 @@ else
 	##########################
 	#	GET LIST OF NODES
 	##########################
-	nodes=($(cat ClusterConfig.csv | cut -d ',' -f2))
+	if [ "$1" == "small" ]
+	then
+		nodes=($(cat ClusterConfigSmall.csv | cut -d ',' -f2))
+	else
+		nodes=($(cat ClusterConfig.csv | cut -d ',' -f2))
+	fi
 	# nodes="lotus"
 	# echo ${nodes[@]}
 
@@ -103,6 +108,9 @@ else
 		elif [ "$1" == "validator" ]
 		then
 			readarray -t unl < ${UNL_DIR}/validator/${n}.txt
+		elif [ "$1" == "small" ]
+		then
+			readarray -t unl < /root/rippledTools/ConfigCluster/unl/fullySmall/${n}.txt
 		fi
 		# echo ${unl[@]}
 
