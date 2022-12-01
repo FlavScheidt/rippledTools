@@ -155,7 +155,7 @@ func main() {
 	    }
 
 		//Connect and start gossipsub
-		gossipsub := "cd "+GOSSIPSUB_PATH+" && nohup go run . -type="+experiment + "-d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout+"\n"
+		gossipsub := "cd "+GOSSIPSUB_PATH+" && nohup go run . -type="+experiment+" -d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout+"\n"
 		for _, hostname := range hosts {
 			go remoteShell(gossipsub, hostname, config)
 		}

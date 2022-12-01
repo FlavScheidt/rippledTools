@@ -31,5 +31,5 @@
 *.out
 *.app
 
-rippledTools/ConfigCluster/validators_*
-rippledTools/ConfigCluster/rippled_*
+~/rippledTools/ConfigCluster/validators_*
+~/rippledTools/ConfigCluster/rippled_*
