@@ -19,6 +19,7 @@
 rippledmon_IP="192.168.20.58"
 #CONFIG_DIR is the folder where you want to put the files on the target servers
 CONFIG_DIR="/root/config/"
+CONFIG_DIR2="/etc/opt/ripple"
 
 UNL_DIR="/root/gossipGoSnt/clusterConfig"
 
@@ -174,6 +175,9 @@ else
 		# Send to server
 		scp ./rippled_${n}.cfg ${n}:${CONFIG_DIR}/rippled.cfg
 		scp ./validators_${n}.txt ${n}:${CONFIG_DIR}/validators.txt
+
+		scp ./rippled_${n}.cfg ${n}:${CONFIG_DIR2}/rippled.cfg
+		scp ./validators_${n}.txt ${n}:${CONFIG_DIR2}/validators.txt
 
 	 done
 fi

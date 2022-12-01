@@ -91,7 +91,7 @@ func main() {
     //		SSH config
     // -----------------------------------------
     user := "root"
-    // timeout := 4800 * time.Second
+    timeout := 4800 * time.Second
 
 	// key, err := ioutil.ReadFile("/root/.ssh/id_rsa")
 	key, err := ioutil.ReadFile("/root/.ssh/id_rsa")
@@ -131,15 +131,15 @@ func main() {
 
 	    fmt.Printf("%+v\n", paramsList)
 
-		// for _, param := range paramsList {
+		for _, param := range paramsList {
 		    for _, hostname := range hosts {
 		    	log.Println(hostname+" Starting rippled")
 			    start := "nohup " + RIPPLED_PATH+"rippled --conf="+RIPPLED_CONFIG+" --silent --net --quorum "+RIPPLED_QUORUM+" & \n"
 			    go remoteShell(start, hostname, config)
-		    // }
-		    // time.Sleep(60 * time.Second)
-		    // log.Println("Connecting to ", PUPPET)
-    		// runPuppet(experiment, config, timeout, param)
+		    }
+		    time.Sleep(60 * time.Second)
+		    log.Println("Connecting to ", PUPPET)
+    		runPuppet(experiment, config, timeout, param)
 		}
 	} else if machine == "puppet" {
 
