@@ -72,7 +72,7 @@ func remoteShell(cmd string, hostname string, config *ssh.ClientConfig,) {
 
     // Enable system stdout
     // Comment these if you uncomment to store in variable
-    // sess.Stdout = os.Stdout
+    sess.Stdout = os.Stdout
     sess.Stderr = os.Stderr
 
     // Start remote shell
