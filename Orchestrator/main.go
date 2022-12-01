@@ -8,6 +8,8 @@ import (
     "os"
     "time"
     "log"
+    "flag"
+    "strings"
 
 
 	"golang.org/x/crypto/ssh"
@@ -19,7 +21,7 @@ import (
 //      Set paths
 // -----------------------------------------
 var PATH="/root/rippledTools/"
-var RIPPLED_PATH="./sntrippled/my_build/"
+var RIPPLED_PATH="/root/sntrippled/my_build/"
 var RIPPLED_CONFIG="/root/config/rippled.cfg"
 var RIPPLED_QUORUM="15"
 
@@ -33,52 +35,6 @@ var PUPPET="liberty"
 
 // var experiment="unl"
 
-func readNodesFile(fileName string) ([]string, error) {
-
-	var nodeList []string
-
-	records, err := readData(fileName)
-    if err != nil {
-        log.Fatal(err)
-        return nodeList, err
-    }
-
-    for _, record := range records {
-    		nodeList = append(nodeList, record[1])
-    }
-
-    log.Println("[INFO] Nodes config file read")
-    return nodeList, nil
-}
-
-
-func readParamsFile(fileName string) ([]OverlayParams, error) {
-
-	var paramsList []OverlayParams
-
-	records, err := readData(fileName)
-    if err != nil {
-        log.Fatal(err)
-        return paramsList, err
-    }
-
-    for _, record := range records {
-    	param := OverlayParams{
-    		d:            record[0],
-	        dlo:          record[1],
-	        dhi:          record[2],
-	        dscore:       record[3],
-	        dlazy:        record[4],
-	        dout:         record[5],
-	        gossipFactor: record[6]}
-
-    	paramsList = append(paramsList, param)
-    }
-
-    log.Println("[INFO] Parameters file read")
-    return paramsList, nil
-}
-
 func main() {
 
 	//------------------------------------------
@@ -87,16 +43,16 @@ func main() {
 	machineFlag := flag.String("machine", "master", "Is this machine a master or a puppet? Deafult is master")
   	experimentType := flag.String("type", "unl", "Type of experiment. Default is unl")
 
-    d := flag.Int("d", 8, "")
-    dlo := flag.Int("dlo", 6, "")
-    dhi := flag.Int("dhi", 12, "")
-    dscore := flag.Int("dscore", 4, "")
-    dlazy := flag.Int("dlazy", 8, "")
-    dout := flag.Int("dout", 2, "")
-    gossipFactor := flag.Float64("gossipFactor", 0.25, "")
+    d := flag.String("d", "8", "")
+    dlo := flag.String("dlo", "6", "")
+    dhi := flag.String("dhi", "12", "")
+    dscore := flag.String("dscore", "4", "")
+    dlazy := flag.String("dlazy", "8", "")
+    dout := flag.String("dout", "2", "")
+    gossipFactor := flag.String("gossipFactor", "0.25", "")
 
-    InitialDelay := flag.Duration("InitialDelay", 100 * time.Millisecond, "")
-    Interval := flag.Duration("Interval", 1 * time.Second, "")
+    // InitialDelay := flag.Duration("InitialDelay", 100 * time.Millisecond, "")
+    // Interval := flag.Duration("Interval", 1 * time.Second, "")
 
     flag.Parse()
 
@@ -163,8 +119,7 @@ func main() {
 		HostKeyCallback: hostKeyCallback,
 	}
 
-	if (machine == "master")
-	{
+	if machine == "master" {
 		// -----------------------------------------
 	    // 		Parameters for GossipSub
 	    // -----------------------------------------
@@ -186,7 +141,7 @@ func main() {
 		    log.Println("Connecting to ", PUPPET)
     		go runPuppet(experiment, config, timeout, param)
 		}
-	} else if (machine == "puppet") {
+	} else if machine == "puppet" {
 
 		//Get parameters from command line
 		param := OverlayParams{

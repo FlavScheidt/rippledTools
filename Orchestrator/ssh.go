@@ -1,57 +1,20 @@
 package main
 
 import (
-    // "bytes"
+    "bytes"
     // "fmt"
     // // "io"
     // // "io/ioutil"
     // // "os"
     "time"
-    // "log"
+    "log"
+    "os"
 
 
-	// "golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh"
 	// kh "golang.org/x/crypto/ssh/knownhosts"
  )
 
-type HeartbeatParams struct {
-    InitialDelay time.Duration
-    Interval     time.Duration
-}
-
-
-type OverlayParams struct {
-    d            string
-    dlo          string
-    dhi          string
-    dscore       string
-    dlazy        string
-    dout         string
-    gossipFactor string
-}
-
-
-// func newSession(hostname string, client *ssh.Client) *ssh.Session {
-
-//     log.Println(hostname+": New session")
-//     ss, err := client.NewSession()
-//         if err != nil {
-//             log.Fatal("unable to create SSH session: ", err)
-//         }
-
-//     return ss
-// }
-
-// func newDial(hostname string, client *ssh.Client) *ssh.Session {
-
-//     log.Println(hostname+": New session")
-//     ss, err := client.NewSession()
-//         if err != nil {
-//             log.Fatal("unable to create SSH session: ", err)
-//         }
-
-//     return ss
-// }
 func executeCmd(cmd string, hostname string, config *ssh.ClientConfig) string {//, client *ssh.Client) string {
     
     var stdoutBuf bytes.Buffer

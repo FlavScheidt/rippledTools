@@ -2,10 +2,10 @@ package main
 
 import (
     // "bytes"
-    // "fmt"
+    "fmt"
     // "io"
     // "io/ioutil"
-    "os"
+    // "os"
     "time"
     "log"
 
@@ -30,7 +30,7 @@ func runPuppet(experiment string, config *ssh.ClientConfig, duration time.Durati
         case res := <-results:
             fmt.Print(res)
         case <-timeout:
-            fmt.Println("Timed out!")
+            log.Println(hostname, ": Timed out!")
             return
     }
 }
