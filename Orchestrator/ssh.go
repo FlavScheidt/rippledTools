@@ -33,7 +33,9 @@ func executeCmd(cmd string, hostname string, config *ssh.ClientConfig) string {/
     ss.Setenv("GOPATH", GOPATH)
     
     // Creating the buffer which will hold the remotly executed command's output.
-    ss.Stdout = &stdoutBuf
+    // ss.Stdout = &stdoutBuf
+    ss.Stdout = os.Stdout
+    ss.Stderr = os.Stderr
     ss.Run(cmd)
 
     // Let's print out the result of command.
