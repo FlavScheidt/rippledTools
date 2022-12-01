@@ -85,11 +85,11 @@ func remoteShell(cmd string, hostname string, config *ssh.ClientConfig,) {
 
     log.Println(hostname, ": Running command | ", cmd)
     stdinBuf.Write([]byte(cmd))
-    time.Sleep(60 * time.Second)
+    time.Sleep(20 * time.Second)
 
-    disown := "disown -h %1\n"
-    log.Println(hostname, ": disown")
-    stdinBuf.Write([]byte(disown))
+    // disown := "disown -h %1\n"
+    // log.Println(hostname, ": disown")
+    // stdinBuf.Write([]byte(disown))
 
     //Wait for sess to finish
     err = sess.Wait()
