@@ -18,7 +18,7 @@ import (
 // -----------------------------------------
 //      Set paths
 // -----------------------------------------
-var PATH="/home/xrpl/rippledTools/"
+var PATH="/root/rippledTools/"
 var RIPPLED_PATH="./sntrippled/my_build/"
 var RIPPLED_CONFIG="/root/config/rippled.cfg"
 var RIPPLED_QUORUM="15"
@@ -29,7 +29,9 @@ var GOSSIPSUB_PARAMETERS=PATH+"/Orchestrator/parameters.csv"
 
 var NODES_CONFIG=PATH+"/ConfigCluster/ClusterConfig.csv"
 
-var experiment="general"
+var PUPPET="liberty"
+
+// var experiment="unl"
 
 func readNodesFile(fileName string) ([]string, error) {
 
@@ -79,14 +81,34 @@ func readParamsFile(fileName string) ([]OverlayParams, error) {
 
 func main() {
 
+	//------------------------------------------
+	//	Proccess flags
+	//------------------------------------------
+	machineFlag := flag.String("machine", "master", "Is this machine a master or a puppet? Deafult is master")
+  	experimentType := flag.String("type", "unl", "Type of experiment. Default is unl")
 
+    d := flag.Int("d", 8, "")
+    dlo := flag.Int("dlo", 6, "")
+    dhi := flag.Int("dhi", 12, "")
+    dscore := flag.Int("dscore", 4, "")
+    dlazy := flag.Int("dlazy", 8, "")
+    dout := flag.Int("dout", 2, "")
+    gossipFactor := flag.Float64("gossipFactor", 0.25, "")
+
+    InitialDelay := flag.Duration("InitialDelay", 100 * time.Millisecond, "")
+    Interval := flag.Duration("Interval", 1 * time.Second, "")
+
+    flag.Parse()
+
+	machine := strings.ToLower(*machineFlag)
+	experiment := strings.ToLower(*experimentType)
 
     // -----------------------------------------
     //      Set log file
     //			Just the go logging feature, nothing special
     // -----------------------------------------
     currentTime := time.Now()
-    LOG_FILE := "./log_"+currentTime.Format("01022006_15_04_05")+".out"
+    LOG_FILE := "./log_"+currentTime.Format("01022006_15_04_05")+"_"+experiment+".out"
     // open log file
     logFile, err := os.OpenFile(LOG_FILE, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
     if err != nil {
@@ -108,17 +130,6 @@ func main() {
     }
 
     fmt.Printf("%+v\n", hosts)
-
-    // -----------------------------------------
-    // 		Parameters for GossipSub
-    // -----------------------------------------
-    // Read nodes name from config file
-    paramsList, er := readParamsFile(GOSSIPSUB_PARAMETERS)
-    if er != nil {
-        log.Panic(error)
-    }
-
-    fmt.Printf("%+v\n", paramsList)
 
     // -----------------------------------------
     //		SSH config
@@ -152,52 +163,47 @@ func main() {
 		HostKeyCallback: hostKeyCallback,
 	}
 
-	// configG := &ssh.ClientConfig{
-	// 	User: user,
-	// 	Auth: []ssh.AuthMethod{
-	// 		ssh.PublicKeys(signer),
-	// 	},
-	// 	HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	// }
-
-	for _, param := range paramsList {
-
-	    for _, hostname := range hosts {
-
-	    	go runParallel(hostname, config, timeout, param)
-
-
+	if (machine == "master")
+	{
+		// -----------------------------------------
+	    // 		Parameters for GossipSub
+	    // -----------------------------------------
+	    // Read nodes name from config file
+	    paramsList, er := readParamsFile(GOSSIPSUB_PARAMETERS)
+	    if er != nil {
+	        log.Panic(error)
 	    }
 
+	    fmt.Printf("%+v\n", paramsList)
 
+		for _, param := range paramsList {
+		    for _, hostname := range hosts {
+		    	log.Println(hostname+" Starting rippled")
+			    start := "nohup " + RIPPLED_PATH+"rippled --silent --conf="+RIPPLED_CONFIG+" --quorum "+RIPPLED_QUORUM+" & \n"
+			    go remoteShell(start, hostname, config)
+		    }
+		    time.Sleep(60 * time.Second)
+		    log.Println("Connecting to ", PUPPET)
+    		go runPuppet(experiment, config, timeout, param)
+		}
+	} else if (machine == "puppet") {
 
+		//Get parameters from command line
+		param := OverlayParams{
+	        d:            *d,
+	        dlo:          *dlo,
+	        dhi:          *dhi,
+	        dscore:       *dscore,
+	        dlazy:        *dlazy,
+	        dout:         *dout,
+	        gossipFactor: *gossipFactor,
+	    }
 
-
-
-		// // -----------------------------------------
-	    // //		Start rippled
-	    // // -----------------------------------------
-	    // log.Println("Starting Rippled")
-	    // cmd := RIPPLED_PATH+"rippled --conf="+RIPPLED_CONFIG+" --quorum "+RIPPLED_QUORUM+" &"
-	    // go runParallel(cmd, hosts, config, timeout, "rippled")
-	    // time.Sleep(10 * time.Second)
-
-
-
-		// // -----------------------------------------
-	 	// //    		Start gossipsub
-	 	// //    -----------------------------------------
-	 	// log.Println("Starting GossipSub")
-	    // cmd = "cd "+GOSSIPSUB_PATH+" && "+GOPATH+"/go run . -type="+experiment+" -d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout
-	    // go runParallel(cmd, hosts, configG, timeout, "gossip")
-
-
-	    // time.Sleep(100 * time.Second)
-
-
-	    // log.Println("Stopping rippled")
-	   	// cmd = RIPPLED_PATH+"rippled stop"
-	    // go runParallel(cmd, hosts, config, timeout, "rippledStop") //, client)
+		//Connect and start gossipsub
+		gossipsub := "cd "+GOSSIPSUB_PATH+" && nohup go run . -type="+experiment + "-d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout+"\n"
+		for _, hostname := range hosts {
+			go remoteShell(gossipsub, hostname, config)
+		}
 
 	}
 
