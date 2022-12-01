@@ -155,7 +155,7 @@ func main() {
 	    }
 
 		//Connect and start gossipsub
-		gossipsub := "cd "+GOSSIPSUB_PATH+" && go run . -type="+experiment+" -d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout+"\n"
+		gossipsub := "cd "+GOSSIPSUB_PATH+" && "+GOPATH+"go run . -type="+experiment+" -d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout+"\n"
 		for _, hostname := range hosts {
 			go executeCmd(gossipsub, hostname, config)
 		}
