@@ -162,7 +162,7 @@ func main() {
     		go runPuppet(experiment, config, timeout, param)
 
     		//Start rippled monitor
-    		go rippledMonitor(config, runTime)
+    		go rippledMonitor(hosts, config, runTime)
 
     		time.Sleep(runTime)
 
