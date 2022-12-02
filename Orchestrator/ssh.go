@@ -68,14 +68,14 @@ func remoteShell(commands []string, hostname string, config *ssh.ClientConfig,) 
     }
 
     // Uncomment to store output in variable
-    // var b bytes.Buffer
-    // sess.Stdout = &b
-    // sess.Stderr = &b
+    var b bytes.Buffer
+    sess.Stdout = &b
+    sess.Stderr = &b
 
     // Enable system stdout
     // Comment these if you uncomment to store in variable
     // sess.Stdout = os.Stdout
-    sess.Stderr = os.Stderr
+    // sess.Stderr = os.Stderr
 
     // Start remote shell
     err = sess.Shell()
@@ -111,8 +111,6 @@ func remoteShell(commands []string, hostname string, config *ssh.ClientConfig,) 
     if err != nil {
         log.Fatal(err)
     }
-
-
     // Uncomment to store in variable
     // log.Println(hostname, ": ", b.String())
 
