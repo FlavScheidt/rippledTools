@@ -36,12 +36,13 @@ var PUPPET="liberty"
 // var experiment="unl"
 
 func main() {
-
 	//------------------------------------------
 	//	Proccess flags
 	//------------------------------------------
 	machineFlag := flag.String("machine", "master", "Is this machine a master or a puppet? Deafult is master")
   	experimentType := flag.String("type", "unl", "Type of experiment. Default is unl")
+
+  	runtime := flag.Duration("runtime", 900*time.Second, "Time for each test, counting from the start of gossipsub. Default is 900s (15 min)")
 
     d := flag.String("d", "8", "")
     dlo := flag.String("dlo", "6", "")
@@ -58,6 +59,7 @@ func main() {
 
 	machine := strings.ToLower(*machineFlag)
 	experiment := strings.ToLower(*experimentType)
+	runTime := *runtime
 
     // -----------------------------------------
     //      Set log file
@@ -130,17 +132,49 @@ func main() {
 	    }
 
 	    fmt.Printf("%+v\n", paramsList)
+		// -----------------------------------------
+	    // 		Clean logs
+	    // -----------------------------------------
+
+	    // -----------------------------------------
+	    // 		Generate config for experiment type
+	    // -----------------------------------------
+
+
+	    // -----------------------------------------
+	    // 		Start rippled
+	    // -----------------------------------------
+	    start := []string{
+	    		"nohup " + RIPPLED_PATH+"rippled --conf="+RIPPLED_CONFIG+" --silent --net --quorum "+RIPPLED_QUORUM+" & \n",
+	    		"disown -h %1\n",
+	    	}
+   		stop := RIPPLED_PATH+"rippled --conf="+RIPPLED_CONFIG+" stop & \n"
 
 		for _, param := range paramsList {
 		    for _, hostname := range hosts {
 		    	log.Println(hostname+" Starting rippled")
-			    start := "nohup " + RIPPLED_PATH+"rippled --conf="+RIPPLED_CONFIG+" --silent --net --quorum "+RIPPLED_QUORUM+" & \n"
 			    go remoteShell(start, hostname, config)
 		    }
 		    time.Sleep(60 * time.Second)
+
+		    //Connect to puppet server and start GossipSub
 		    log.Println("Connecting to ", PUPPET)
-    		runPuppet(experiment, config, timeout, param)
+    		go runPuppet(experiment, config, timeout, param)
+
+    		time.Sleep(runTime)
+
+    		//Stop rippled
+    		for _, hostname := range hosts {
+		    	log.Println(hostname+" Stoping rippled")
+			    go executeCmd(stop, hostname, config)
+		    }
 		}
+
+	    // -----------------------------------------
+	    // 		Collect the logs
+	    // -----------------------------------------
+
+
 	} else if machine == "puppet" {
 
 		//Get parameters from command line
@@ -157,11 +191,19 @@ func main() {
 		//Connect and start gossipsub
 		gossipsub := "cd "+GOSSIPSUB_PATH+" && "+GOPATH+"go run . -type="+experiment+" -d="+param.d+" -dlo="+param.dlo+" -dhi="+param.dhi+" -dscore="+param.dscore+" -dlazy="+param.dlazy+" -dout="+param.dout+"\n"
 		for _, hostname := range hosts {
+			log.Println("Starting GossipSub")
 			go executeCmd(gossipsub, hostname, config)
 		}
 
-	}
+		time.Sleep(runTime)
 
+		kill := "pkill -9 gossipGoSnt && pkill -9 rippled\n"
+		for _, hostname := range hosts {
+			log.Println("Stoping GossipSub")
+			go executeCmd(kill, hostname, config)
+		}
+
+	}
 	// time.Sleep(100 * time.Second)
 	select {}
  }

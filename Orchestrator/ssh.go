@@ -6,7 +6,7 @@ import (
     // // "io"
     // // "io/ioutil"
     // // "os"
-    "time"
+    // "time"
     "log"
     "os"
 
@@ -44,7 +44,7 @@ func executeCmd(cmd string, hostname string, config *ssh.ClientConfig) string {/
     return hostname + ": " + stdoutBuf.String()
 }
 
-func remoteShell(cmd string, hostname string, config *ssh.ClientConfig,) {
+func remoteShell(commands []string, hostname string, config *ssh.ClientConfig,) {
 
     client, err := ssh.Dial("tcp", hostname+":22", config)
         if err != nil {
@@ -83,20 +83,13 @@ func remoteShell(cmd string, hostname string, config *ssh.ClientConfig,) {
         log.Fatal(err)
     }
 
-    log.Println(hostname, ": Running command | ", cmd)
-    stdinBuf.Write([]byte(cmd))
-    time.Sleep(20 * time.Second)
+    // log.Println(hostname, ": Running command | ", cmd)
+    // stdinBuf.Write([]byte(cmd))
+    // time.Sleep(20 * time.Second)
 
     // disown := "disown -h %1\n"
     // log.Println(hostname, ": disown")
     // stdinBuf.Write([]byte(disown))
-
-    //Wait for sess to finish
-    err = sess.Wait()
-    if err != nil {
-        log.Fatal(err)
-    }
-
     // send the commands
     // commands := []string{
     //     "pwd",
@@ -105,36 +98,23 @@ func remoteShell(cmd string, hostname string, config *ssh.ClientConfig,) {
     //     "exit",
     // }
 
-    // for _, cmd := range commands {
-    //     _, err = fmt.Fprintf(stdin, "%s\n", cmd)
-    //     if err != nil {
-    //         log.Fatal(err)
-    //     }
-    // }
+    for _, cmd := range commands {
+        // _, err = fmt.Fprintf(stdin, "%s\n", cmd)
+        _, err = stdinBuf.Write([]byte(cmd))
+        if err != nil {
+            log.Fatal(err)
+        }
+    }
+
+    //Wait for sess to finish
+    err = sess.Wait()
+    if err != nil {
+        log.Fatal(err)
+    }
+
 
     // Uncomment to store in variable
     // log.Println(hostname, ": ", b.String())
 
 }
 
-// func runParallel(cmd string, hosts []string, config *ssh.ClientConfig, duration time.Duration, tp string) {
-
-//     results := make(chan string, 10)
-//     timeout := time.After(duration)
-
-//     for _, hostname := range hosts {
-//         go func(hostname string) {
-//             results <- executeCmd(cmd, hostname, config, tp)
-//         }(hostname)
-//     }
-
-//     for i := 0; i < len(hosts); i++ {
-//         select {
-//         case res := <-results:
-//             fmt.Print(res)
-//         case <-timeout:
-//             fmt.Println("Timed out!")
-//             return
-//         }
-//     }
-// }
