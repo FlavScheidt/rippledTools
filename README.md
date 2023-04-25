@@ -1,6 +1,8 @@
 # rippledTools
 Automatized tasks for configuring and analyzing rippled validators
 
+We assume that every node in the network can access each other by the name.
+
 # Config Cluster
 
 Configures the cluster topology according to the desired type of test. It is basically an UNL configuration tool
@@ -28,9 +30,48 @@ We assume that the rippled keys for each validator were created previously. All 
 #### General configuration files
 **ClusterConfig.csv**  - lists the nodes and their info
   #####Format:
+  ```
     IP,name,rippledKey,unl
+ ```
 **rippled.cfg** - master model for the rippled.cfg, with all an empty "validators" session.
 **validators.txt** - master model for the validators.txt file
 
 #### Topology Speficiations
 The topology specifications for the **general** test must be in the ConfigCluster/unl directory. The **unl** test is configured directly on the ClusterConfig.csv, the field "unl" specifies to which UNL a node is subscribed to. The path for the file containing which node belongs to each UNL (UNL_DIR) must be set on generate_config_rippled.sh 
+
+
+# New Run
+Deletes databses and logs for a fresh restart (rmeotely).
+
+Usage:
+```
+$ ./prepareNewRun
+```
+## Configuration
+**nodes.txt** names of the nodes
+
+# InspectSync
+Script for inspecting if the nodes are synchronized or not (via ssh)
+
+Usage:
+```
+./inspect.sh
+```
+Returns:
+
+```
+datetime nodeName lastClosedLedger index timeClosed parentLedger openIndex
+```
+
+# ExportLogs
+Export logs from rippled, sntRippled and gossipGoSnt to a given destination
+
+Usage:
+```
+./export,sh
+```
+
+##Configuration
+Directly on export.sh
+
+
