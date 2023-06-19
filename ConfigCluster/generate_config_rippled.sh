@@ -22,6 +22,7 @@ CONFIG_DIR="/root/config/"
 CONFIG_DIR2="/etc/opt/ripple"
 
 UNL_DIR="/root/gossipGoSnt/clusterConfig"
+CPATH="/root/flexi-pipe/rippledTools/ConfigCluster"
 
 ##########################
 #	Craeting some directories
@@ -38,7 +39,7 @@ UNL_DIR="/root/gossipGoSnt/clusterConfig"
 ##########################
 if [ "$1" == "clean" ]
 then
-	rm -rf validators_* rippled_*
+	rm -rf ${CPATH}/validators_* ${CPATH}/rippled_*
 else
 
 	##########################
@@ -46,9 +47,9 @@ else
 	##########################
 	if [ "$1" == "small" ]
 	then
-		nodes=($(cat ClusterConfigSmall.csv | cut -d ',' -f2))
+		nodes=($(cat ${CPATH}/ClusterConfigSmall.csv | cut -d ',' -f2))
 	else
-		nodes=($(cat ClusterConfig.csv | cut -d ',' -f2))
+		nodes=($(cat ${CPATH}/ClusterConfig.csv | cut -d ',' -f2))
 	fi
 	# nodes="lotus"
 	# echo ${nodes[@]}
@@ -70,11 +71,11 @@ else
 		# scp ${n}:/opt/local/etc/rippled.cfg ./rippled_${n}.cfg
 
 		# RYCB Uncomment if you want to use the local rippled.cfg file (you need to provide the keys, then)
-		cp rippled.cfg rippled_${n}.cfg
+		cp ${CPATH}/rippled.cfg ${CPATH}/rippled_${n}.cfg
 
 		# Create validators file
-		cp validators.txt validators_${n}.txt
-		echo "" | tee -a validators_${n}.txt >/dev/null
+		cp ${CPATH}/validators.txt ${CPATH}/validators_${n}.txt
+		echo "" | tee -a ${CPATH}/validators_${n}.txt >/dev/null
 
 		# Insight
 		# RYCB If you don't want to configure rippledmon, comment this line
@@ -90,34 +91,34 @@ else
 
 		# Add key
 		# RYCB comment if you already configured the key, if not, be sure to put it on the keys folder
-		echo "" | tee -a rippled_${n}.cfg >/dev/null
-		cat ./keys/${n}.txt | tee -a rippled_${n}.cfg >/dev/null
-		echo "" | tee -a rippled_${n}.cfg >/dev/null
+		echo "" | tee -a ${CPATH}/rippled_${n}.cfg >/dev/null
+		cat ${CPATH}/keys/${n}.txt | tee -a ${CPATH}/rippled_${n}.cfg >/dev/null
+		echo "" | tee -a ${CPATH}/rippled_${n}.cfg >/dev/null
 
-		nodeIP=($(cat ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f1))
-		nodeKey=($(cat ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f3))
+		nodeIP=($(cat ${CPATH}/ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f1))
+		nodeKey=($(cat ${CPATH}/ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f3))
 
 		# Print the IPS of the UNL
-		# First we need to get the ips
+		# First we need to get the ips${CPATH}/
 		if [ "$1" == "unl" ]
 		then
-			unl=($(cat ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f4))
+			unl=($(cat ${CPATH}/ClusterConfig.csv | grep -i ",${n}," | cut -d "," -f4))
 			readarray -t unl < ${UNL_DIR}/unl/${unl}.txt
 		elif [ "$1" == "general" ]
 		then
-			readarray -t unl < ./unl/fullyConnected/${n}.txt
+			readarray -t unl < ${CPATH}/unl/fullyConnected/${n}.txt
 		elif [ "$1" == "validator" ]
 		then
 			readarray -t unl < ${UNL_DIR}/validator/${n}.txt
 		elif [ "$1" == "small" ]
 		then
-			readarray -t unl < /root/rippledTools/ConfigCluster/unl/fullySmall/${n}.txt
+			readarray -t unl < ${CPATH}/unl/fullySmall/${n}.txt
 		fi
 		# echo ${unl[@]}
 
 		#Print header into rippled.cfg
-		echo "" | tee -a rippled_${n}.cfg >/dev/null
-		echo "[ips_fixed]" | tee -a rippled_${n}.cfg >/dev/null
+		echo "" | tee -a ${CPATH}/rippled_${n}.cfg >/dev/null
+		echo "[ips_fixed]" | tee -a ${CPATH}/rippled_${n}.cfg >/dev/null
 
 		# #iterate over unl and print ips into rippled.cfg and keys into validators.txt
 		for peer in "${unl[@]}";
@@ -125,12 +126,12 @@ else
 			if [ "$[peer]" != "${n}" ] 
 			then
 				# Get IP and print to rippled.cfg
-				ip=($(cat ClusterConfig.csv | grep -i ",${peer}," | cut -d "," -f1))
-				echo "$ip 51235" | tee -a rippled_${n}.cfg >/dev/null
+				ip=($(cat ${CPATH}/ClusterConfig.csv | grep -i ",${peer}," | cut -d "," -f1))
+				echo "$ip 51235" | tee -a ${CPATH}/rippled_${n}.cfg >/dev/null
 
 				#Get key and print to validators.txt
-				key=($(cat ClusterConfig.csv | grep -i ",${peer}," | cut -d "," -f3))
-				echo "$key" | tee -a validators_${n}.txt >/dev/null
+				key=($(cat ${CPATH}/ClusterConfig.csv | grep -i ",${peer}," | cut -d "," -f3))
+				echo "$key" | tee -a ${CPATH}/validators_${n}.txt >/dev/null
 			fi
 		done
 
@@ -146,38 +147,38 @@ else
 					unlName=$(echo ${f} | cut -d "." -f1 | cut -d "/" -f6)
 
 					#Go to the config file and get the keys from the nodes that have this unl
-					ips=($(cat ClusterConfig.csv | grep -i ",${unlName}" | cut -d "," -f1))
-					keys=($(cat ClusterConfig.csv | grep -i ",${unlName}" | cut -d "," -f3))
+					ips=($(cat ${CPATH}/ClusterConfig.csv | grep -i ",${unlName}" | cut -d "," -f1))
+					keys=($(cat ${CPATH}/ClusterConfig.csv | grep -i ",${unlName}" | cut -d "," -f3))
 
 
 					for ip in "${ips[@]}"
 					do 
-						isInFile=$(cat rippled_${n}.cfg | grep -c ${ip})
+						isInFile=$(cat ${CPATH}/rippled_${n}.cfg | grep -c ${ip})
 						if [ $isInFile -eq 0 ] && [ "${ip}" != "${nodeIP}" ]
 						then
-							echo "${ip} 51235" |  tee -a rippled_${n}.cfg >/dev/null;
+							echo "${ip} 51235" |  tee -a ${CPATH}/rippled_${n}.cfg >/dev/null;
 						fi
 					done
 					for key in "${keys[@]}"
 					do 						
-						isInFile=$(cat validators_${n}.txt | grep -c ${key})
+						isInFile=$(cat ${CPATH}/validators_${n}.txt | grep -c ${key})
 						if [ $isInFile -eq 0 ] && [ "${key}" != "${nodeKey}" ]
 						then
-							echo "${key}" | tee -a validators_${n}.txt >/dev/null;
+							echo "${key}" | tee -a ${CPATH}/validators_${n}.txt >/dev/null;
 						fi
 					done  
 				fi
 			done
 		fi
 
-		echo "" | tee -a rippled_${n}.cfg >/dev/null
+		echo "" | tee -a ${CPATH}/rippled_${n}.cfg >/dev/null
 
 		# Send to server
-		scp ./rippled_${n}.cfg ${n}:${CONFIG_DIR}/rippled.cfg
-		scp ./validators_${n}.txt ${n}:${CONFIG_DIR}/validators.txt
+		scp ${CPATH}//rippled_${n}.cfg ${n}:${CONFIG_DIR}/rippled.cfg
+		scp ${CPATH}//validators_${n}.txt ${n}:${CONFIG_DIR}/validators.txt
 
-		scp ./rippled_${n}.cfg ${n}:${CONFIG_DIR2}/rippled.cfg
-		scp ./validators_${n}.txt ${n}:${CONFIG_DIR2}/validators.txt
+		scp ${CPATH}//rippled_${n}.cfg ${n}:${CONFIG_DIR2}/rippled.cfg
+		scp ${CPATH}//validators_${n}.txt ${n}:${CONFIG_DIR2}/validators.txt
 
 	 done
 fi

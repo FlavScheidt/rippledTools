@@ -34,11 +34,13 @@ NEW_STDOUTVANILLALOGS_DIR="/home/xrpl/rippledVanillaStdOutLogs"
 GRPCLOGS_DIR="/root/gossipGoSnt"
 NEW_GRPCLOGS_DIR="/home/xrpl/rippledgRPCLogs"
 
+CPATH="/root/flexi-pipe/rippledTools/NewRun"
+
 
 ##########################
 #	START
 ##########################
-readarray -t nodes < ./nodes.txt
+readarray -t nodes < ${CPATH}/nodes.txt
 
 for n in "${nodes[@]}";
 do
