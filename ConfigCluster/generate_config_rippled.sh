@@ -28,10 +28,10 @@ CPATH="/root/flexi-pipe/rippledTools/ConfigCluster"
 #	Craeting some directories
 #		(if needed)
 ##########################
-#if [ ! -d "$CONFIG_DIR" ]
-#then
-#	mkdir "$CONFIG_DIR"
-#fi
+if [ ! -d "$CONFIG_DIR" ]
+then
+	mkdir "$CONFIG_DIR"
+fi
 
 ##########################
 #	Are we cleaning?
@@ -174,11 +174,11 @@ else
 		echo "" | tee -a ${CPATH}/rippled_${n}.cfg >/dev/null
 
 		# Send to server
-		scp ${CPATH}//rippled_${n}.cfg ${n}:${CONFIG_DIR}/rippled.cfg
-		scp ${CPATH}//validators_${n}.txt ${n}:${CONFIG_DIR}/validators.txt
+		scp ${CPATH}/rippled_${n}.cfg ${n}:${CONFIG_DIR}/rippled.cfg
+		scp ${CPATH}/validators_${n}.txt ${n}:${CONFIG_DIR}/validators.txt
 
-		scp ${CPATH}//rippled_${n}.cfg ${n}:${CONFIG_DIR2}/rippled.cfg
-		scp ${CPATH}//validators_${n}.txt ${n}:${CONFIG_DIR2}/validators.txt
+		scp ${CPATH}/rippled_${n}.cfg ${n}:${CONFIG_DIR2}/rippled.cfg
+		scp ${CPATH}/validators_${n}.txt ${n}:${CONFIG_DIR2}/validators.txt
 
 	 done
 fi

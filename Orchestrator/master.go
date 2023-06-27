@@ -29,7 +29,7 @@ func rippledMonitor(hosts []string, config *ssh.ClientConfig, duration time.Dura
 
             select {
                 case res := <-results:
-                    fmt.Println(hostname, res)
+                    log.Println(hostname, res)
                 case <-timeout:
                     log.Println(hostname, ": Timed out!")
                     return
